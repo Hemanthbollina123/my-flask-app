@@ -1,0 +1,38 @@
+# Define the stages of the pipeline
+stages:
+  - build
+  - test
+  - deploy
+
+# Job to build the application
+build:
+  stage: build
+  image: python:3.10
+  script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+
+# Job to run the tests
+test:
+  stage: test
+  image: python:3.10
+  script:
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    - python -m unittest discover -s tests
+  only:
+    - main  # Run tests only on the main branch
+
+# Job to deploy the application (example for Heroku)
+deploy:
+  stage: deploy
+  image: python:3.10
+  script:
+    - source venv/bin/activate
+    - pip install gunicorn
+    - pip install -r requirements.txt
+    - heroku login -i
+    - git push heroku main
+  only:
+    - main  # Deploy only from the main branch
